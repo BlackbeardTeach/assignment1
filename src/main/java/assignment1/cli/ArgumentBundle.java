@@ -6,10 +6,10 @@ public class ArgumentBundle {
     public String operation;
 
     // Required: Input File Path
-    public String inputFilePath;
+    public String inputFile;
 
     // Optional: Output File Path if null, output goes into stdout
-    public String outputFilePath;
+    public String outputFile;
 
     // Optional: Direct AES key file path (Base64 encoded)
     public String keyFile;
@@ -35,8 +35,8 @@ public class ArgumentBundle {
      */
     public ArgumentBundle() {
         this.operation = null;
-        this.inputFilePath = null;
-        this.outputFilePath = null;
+        this.inputFile = null;
+        this.outputFile = null;
         this.keyFile = null;
         this.password = null;
         this.saltFile = null;

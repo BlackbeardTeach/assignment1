@@ -4,10 +4,6 @@ import assignment1.crypto.CipherUtils;
 import assignment1.crypto.Decryptor;
 import assignment1.crypto.Encryptor;
 
-/**
- * CLIApplication is the main entry point that orchestrates argument parsing,
- * validation, and dispatching to encryption or decryption operations.
- */
 public class CLIApplication {
 
     /**

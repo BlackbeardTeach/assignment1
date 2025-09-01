@@ -13,10 +13,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-/**
- * CipherUtils provides utility functions for cryptographic operations.
- * Handles key derivation, Base64 decoding, and cipher initialization.
- */
 public class CipherUtils {
     
     // PBKDF2 configuration as specified in assignment

@@ -1,9 +1,5 @@
 package assignment1.cli;
 
-/**
- * ArgumentParser handles parsing command-line arguments into an ArgumentBundle.
- * Supports flexible flag ordering and validates argument combinations.
- */
 public class ArgumentParser {
 
     /**

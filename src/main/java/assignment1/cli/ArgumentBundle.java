@@ -1,9 +1,5 @@
 package assignment1.cli;
 
-/**
- * ArgumentBundle holds all parsed command-line arguments for the encryption/decryption operation.
- * This acts as a data transfer object between the argument parser and the crypto operations.
- */
 public class ArgumentBundle {
     
     // Required: Operation mode - either "enc" for encryption or "dec" for decryption

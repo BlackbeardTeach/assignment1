@@ -1,37 +1,43 @@
 package assignment1.cli;
 
+/**
+ * ArgumentBundle holds all parsed command-line arguments for the encryption/decryption operation.
+ * This acts as a data transfer object between the argument parser and the crypto operations.
+ */
 public class ArgumentBundle {
-
-    // Required: Operation Mode - either "enc" for encryption or "dec" for decryption
+    
+    // Required: Operation mode - either "enc" for encryption or "dec" for decryption
     public String operation;
-
-    // Required: Input File Path
+    
+    // Required: Path to input file to be encrypted or decrypted
     public String inputFile;
-
-    // Optional: Output File Path if null, output goes into stdout
+    
+    // Optional: Path to output file. If null, output goes to stdout
     public String outputFile;
-
+    
     // Optional: Direct AES key file path (Base64 encoded)
+    // If provided, takes precedence over password-based derivation
     public String keyFile;
-
+    
     // Optional: Password for PBKDF2 key derivation
     // Must be used together with saltFile
     public String password;
-
-    // Optional: Salt file path for PBKDF2 key derivation
-    // Required when using password-based key derivation (Base64 encoded, 8 bytes)
+    
+    // Optional: Salt file path (Base64 encoded, 8 bytes)
+    // Required when using password-based key derivation
     public String saltFile;
-
-    // Optional: IV file path (Base64 encoded, 16 bytes for AES)
+    
+    // Optional: IV file path (Base64 encoded, typically 16 bytes for AES)
+    // Required for all modes except ECB
     public String ivFile;
-
+    
     // Optional: Cipher specification in format "aes-{128,192,256}-{ecb,cbc,cfb,ofb,ctr,gcm}"
     // Defaults to "aes-256-cbc" if not specified
     public String cipher;
-
-    /** 
-     * Constructor initializes all fields to null
-     * The ArgumentParser will populate these fields based on command line input
+    
+    /**
+     * Constructor initializes all fields to null.
+     * The ArgumentParser will populate these fields based on command-line input.
      */
     public ArgumentBundle() {
         this.operation = null;
@@ -43,45 +49,44 @@ public class ArgumentBundle {
         this.ivFile = null;
         this.cipher = null;
     }
-
+    
     /**
-     * Checks if password-based key deribvation should be used
-     * @return true if both password and saltFile are provided, false otherwise
+     * Checks if password-based key derivation should be used.
+     * @return true if password and salt are both provided
      */
-    public boolean isPasswordBasedKeyDerivation() {
-        return this.password != null && this.saltFile != null;
+    public boolean usePasswordDerivation() {
+        return password != null && saltFile != null;
     }
-
-    /** 
-     * Checks if direct key should be used
-     * @return true if keyFile is provided, false otherwise
-     */
-    public boolean isDirectKeyUsage() {
-        return this.keyFile != null;
-    }
-
+    
     /**
-     * Gets the cipher specifications, defaulting to "aes-256-cbc" if not set
+     * Checks if direct key should be used.
+     * @return true if keyFile is provided
+     */
+    public boolean useDirectKey() {
+        return keyFile != null;
+    }
+    
+    /**
+     * Gets the cipher specification, defaulting to "aes-256-cbc" if not set.
      * @return cipher specification string
      */
     public String getCipherOrDefault() {
-        return this.cipher != null ? this.cipher : "aes-256-cbc";
+        return cipher != null ? cipher : "aes-256-cbc";
     }
-
+    
     /**
-     * Checks if an IV is required based on the cipher mode
-     * ECB mode doesn't use an IV, all other modes do
-     * @return true if IV is required for the specified cipher mode, false otherwise
+     * Checks if an IV is required based on the cipher mode.
+     * ECB mode doesn't use an IV, all other modes do.
+     * @return true if IV is required for the specified cipher mode
      */
     public boolean isIvRequired() {
         String cipherSpec = getCipherOrDefault().toLowerCase();
-        // Extract the mode part (eg, "cbc" from "aes-256-cbc")
+        // Extract the mode part (e.g., "cbc" from "aes-256-cbc")
         String[] parts = cipherSpec.split("-");
-        if(parts.length >= 3){
+        if (parts.length >= 3) {
             String mode = parts[2];
             return !"ecb".equals(mode);
         }
-        return true;
+        return true; // Default to requiring IV if we can't parse the cipher
     }
-
 }

@@ -1,43 +1,50 @@
 package assignment1.cli;
 
-public class ArgumentParser {
 /**
-    * Parses command-line arguments into an ArgumentBundle.
-    * 
-    * Expected format: java Assignment1 enc|dec -in <file> [-out <file>] 
-    *                  [-pass <password>] [-salt <salt.base64>] [-key <key.base64>] 
-    *                  [-iv <iv.base64>] [-cipher <cipher>]
-    * 
-    * @param args Command-line arguments array
-    * @return ArgumentBundle containing parsed arguments
-    * @throws IllegalArgumentException if arguments are invalid or missing
-*/
+ * ArgumentParser handles parsing command-line arguments into an ArgumentBundle.
+ * Supports flexible flag ordering and validates argument combinations.
+ */
+public class ArgumentParser {
+
+    /**
+     * Parses command-line arguments into an ArgumentBundle.
+     * 
+     * Expected format: java Assignment1 enc|dec -in <file> [-out <file>] 
+     *                  [-pass <password>] [-salt <salt.base64>] [-key <key.base64>] 
+     *                  [-iv <iv.base64>] [-cipher <cipher>]
+     * 
+     * @param args Command-line arguments array
+     * @return ArgumentBundle containing parsed arguments
+     * @throws IllegalArgumentException if arguments are invalid or missing
+     */
     public static ArgumentBundle parse(String[] args) throws IllegalArgumentException {
         ArgumentBundle bundle = new ArgumentBundle();
 
-        // Check minimim argument count: at least operation and -in flag with value
-        if(args.length < 3) {
-            throw new IllegalArgumentException("Insufficient arguments provided.");
+        // Check minimum argument count: at least operation and -in flag with value
+        if (args.length < 3) {
+            throw new IllegalArgumentException("Too few arguments. Usage: java Assignment1 enc|dec -in <file> [options]");
         }
 
         // First argument must be the operation: "enc" or "dec"
         String operation = args[0].toLowerCase();
-        if(!operation.equals("enc") && !operation.equals("dec")) {
-            throw new IllegalArgumentException("First argument must be 'enc' or 'dec'.");
+        if (!operation.equals("enc") && !operation.equals("dec")) {
+            throw new IllegalArgumentException("First argument must be 'enc' or 'dec', got: " + args[0]);
         }
         bundle.operation = operation;
 
         // Parse remaining arguments as flag-value pairs
         // Flags can appear in any order after the operation
-        for(int i = 1; i < args.length; i++){
+        for (int i = 1; i < args.length; i++) {
             String flag = args[i];
-
-            //Each flag should be followed by a value (except possibly the last one)
-            if(i + 1 >= args.length) {
-                throw new IllegalArgumentException("Flag " + flag + " requires a value.");
+            
+            // Each flag should be followed by a value (except possibly the last one)
+            if (i + 1 >= args.length) {
+                throw new IllegalArgumentException("Flag " + flag + " requires a value");
             }
-
+            
             String value = args[i + 1];
+            
+            // Parse each supported flag
             switch (flag) {
                 case "-in":
                     bundle.inputFile = value;
@@ -45,14 +52,14 @@ public class ArgumentParser {
                 case "-out":
                     bundle.outputFile = value;
                     break;
+                case "-key":
+                    bundle.keyFile = value;
+                    break;
                 case "-pass":
                     bundle.password = value;
                     break;
                 case "-salt":
                     bundle.saltFile = value;
-                    break;
-                case "-key":
-                    bundle.keyFile = value;
                     break;
                 case "-iv":
                     bundle.ivFile = value;
@@ -63,11 +70,14 @@ public class ArgumentParser {
                 default:
                     throw new IllegalArgumentException("Unknown flag: " + flag);
             }
-            i++; // Skip the value
+            
+            // Skip the value on next iteration since we just processed it
+            i++;
         }
+
         // Validate required arguments and combinations
         validateArguments(bundle);
-
+        
         return bundle;
     }
 
@@ -86,9 +96,9 @@ public class ArgumentParser {
         }
 
         // Must have either a direct key OR password+salt (but not neither)
-        boolean hasKey = bundle.isDirectKeyUsage();
-        boolean hasPasswordAndSalt = bundle.isPasswordBasedKeyDerivation();
-
+        boolean hasKey = bundle.useDirectKey();
+        boolean hasPasswordAndSalt = bundle.usePasswordDerivation();
+        
         if (!hasKey && !hasPasswordAndSalt) {
             throw new IllegalArgumentException("Must provide either -key or both -pass and -salt");
         }
